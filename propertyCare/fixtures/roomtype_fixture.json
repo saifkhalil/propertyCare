@@ -1,0 +1,30 @@
+[
+    {
+        "model": "propertyCare.roomtype",
+        "pk": 1,
+        "fields": {
+            "type_name": "Bedroom"
+        }
+    },
+    {
+        "model": "propertyCare.roomtype",
+        "pk": 2,
+        "fields": {
+            "type_name": "Living Room"
+        }
+    },
+    {
+        "model": "propertyCare.roomtype",
+        "pk": 3,
+        "fields": {
+            "type_name": "Kitchen"
+        }
+    },
+    {
+        "model": "propertyCare.roomtype",
+        "pk": 4,
+        "fields": {
+            "type_name": "Bathroom"
+        }
+    }
+]
