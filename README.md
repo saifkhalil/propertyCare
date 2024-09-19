@@ -82,17 +82,13 @@ pip install -r requirements.txt
 ### Step 4: Configure the Database
 In the settings.py file, configure your database (e.g., PostgreSQL or SQLite):
 
+Create .env file and add the below lines
 ```
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_database_name',
-        'USER': 'your_database_user',
-        'PASSWORD': 'your_database_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+LOCAL_PG_DATABASE=database_name
+LOCAL_PG_USER=database_user
+LOCAL_PG_PASSWORD=database_password
+LOCAL_PG_HOST=database_localhost
+LOCAL_PG_PORT=database_port
 ```
 ### Step 5: Apply Migrations
 ```bash
