@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Property, Floor, Room, RoomType, Team, MaintenanceRequest, Task, Status, EquipmentType, Equipment
+from .models import Property, Floor, Room, RoomType, Team, MaintenanceRequest, Task, Status, EquipmentType, Equipment, \
+    IssueType, Issue
 
 
 class RoomTypeSerializer(serializers.ModelSerializer):
@@ -63,13 +64,22 @@ class EquipmentSerializer(serializers.ModelSerializer):
         model = Equipment
         fields = ['id', 'name', 'type', 'type_id', 'assigned_team', 'auto_assigned_team']
 
+class IssueTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IssueType
+        fields = '__all__'
+
+class IssueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
+        fields = '__all__'
 
 class MaintenanceRequestSerializer(serializers.ModelSerializer):
-    equipments = EquipmentSerializer(many=True, read_only=True)
-    equipment_ids = serializers.PrimaryKeyRelatedField(queryset=Equipment.objects.all(), write_only=True, many=True,
-                                                       source='equipments')
+    issues = IssueSerializer(many=True, read_only=True)
+    issue_ids = serializers.PrimaryKeyRelatedField(queryset=Issue.objects.all(), write_only=True, many=True, source='issues')
 
     class Meta:
         model = MaintenanceRequest
-        fields = ['id', 'property', 'issue_description', 'request_date', 'status', 'assigned_team', 'equipments',
-                  'equipment_ids']
+        fields = ['id', 'property', 'issues', 'issue_ids', 'issue_description', 'request_date', 'status', ]
+
+

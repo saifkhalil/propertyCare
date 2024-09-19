@@ -93,6 +93,8 @@ class Task(BaseModel):
     def __str__(self):
         return self.title
 
+
+
 class EquipmentType(BaseModel):
     name = models.CharField(max_length=255)
 
@@ -108,10 +110,26 @@ class Equipment(BaseModel):
     def __str__(self):
         return f"{self.name} ({self.type.name})"
 
+class IssueType(BaseModel):
+    equipment = models.ForeignKey(Equipment, related_name="issue_types", on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.type} ({self.equipment.name})"
+
+class Issue(BaseModel):
+    equipment = models.ForeignKey(Equipment, related_name="issues", on_delete=models.CASCADE)
+    issue_type = models.ForeignKey(IssueType, related_name="issues", on_delete=models.SET_NULL, null=True, blank=True)
+    note = models.TextField()
+
+    def __str__(self):
+        return f"Issue with {self.equipment.name} - {self.issue_type.type}"
+
 class MaintenanceRequest(BaseModel):
     property = models.ForeignKey(Property, related_name="maintenance_requests", on_delete=models.CASCADE)
     floor = models.ForeignKey(Floor, related_name="maintenance_request", on_delete=models.CASCADE, null=True)
     room = models.ForeignKey(Room, related_name="maintenance_request", on_delete=models.CASCADE, null=True)
+    issues = models.ManyToManyField(Issue, related_name="maintenance_requests")
     issue_description = models.TextField()
     request_date = models.DateField(auto_now_add=True)
     status = models.ForeignKey(Status, related_name="%(class)s_status", on_delete=models.CASCADE)
@@ -121,28 +139,6 @@ class MaintenanceRequest(BaseModel):
     def __str__(self):
         return f"{self.property.name} - {self.status}"
 
-'''
-    def save(self, *args, **kwargs):
-        super(MaintenanceRequest, self).save(*args, **kwargs)
-
-        # Check equipment for auto-assigned team and create tasks
-        print('equipments: ', self.equipments.all())
-        for equipment in self.equipments.all():
-            print('equipment: ', equipment, ' auto_assigned_team: ', equipment.auto_assigned_team)
-            if equipment.auto_assigned_team and equipment.assigned_team:
-                # Create a task for each piece of equipment with auto-assigned team
-                print('equipment', equipment, ' is True')
-                Task.objects.create(
-                    title=f"Maintenance for {equipment.name}",
-                    description=f"Maintenance request for {self.property.name} regarding {equipment.name}",
-                    assigned_to=None,  # Assigned to a team, not an individual
-                    due_date=self.request_date,  # Example: Due date is the same as request date
-                    status=Status.objects.get(id=1),
-                    created_by=self.created_by,  # Assign to the creator of the maintenance request
-                    created_at = self.created_at
-                )
-
-'''
 
 @receiver(m2m_changed, sender=MaintenanceRequest.equipments.through)
 def create_tasks_for_equipment(sender, instance, action, **kwargs):

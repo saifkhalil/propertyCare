@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Property, Floor, Room, RoomType, Task, MaintenanceRequest, Team, EquipmentType, Equipment, Status
+from .models import Property, Floor, Room, RoomType, Task, MaintenanceRequest, Team, EquipmentType, Equipment, Status, \
+    IssueType, Issue
+from django.urls import reverse
 
 
 class BaseAdmin(admin.ModelAdmin):
@@ -34,6 +36,24 @@ class TaskAdmin(BaseAdmin):
 @admin.register(Status)
 class StatusAdmin(BaseAdmin):
     list_display = ('name', )
+
+@admin.register(IssueType)
+class IssueTypeAdmin(BaseAdmin):
+    list_display = ('equipment', 'type', 'created_at', 'created_by', 'modified_at', 'modified_by')
+
+
+@admin.register(Issue)
+class IssueAdmin(BaseAdmin):
+    list_display = ('equipment', 'issue_type', 'note', 'created_at', 'created_by', 'modified_at', 'modified_by')
+
+    class Media:
+        js = ('admin/js/filter_issue_types.js',)  # Add the custom JavaScript file
+
+    # Customize the change form to inject data for filtering
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['issue_type_url'] = reverse('filter_issue_types')  # Remove the 'propertyCare:' namespace
+        return super().changeform_view(request, object_id, form_url, extra_context=extra_context)
 
 
 @admin.register(MaintenanceRequest)

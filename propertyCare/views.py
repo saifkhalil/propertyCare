@@ -1,7 +1,10 @@
 from rest_framework import viewsets
-from .models import Property, Floor, Room, RoomType, Task, MaintenanceRequest, Status, Team, EquipmentType, Equipment
+from django.http import JsonResponse
+from .models import Property, Floor, Room, RoomType, Task, MaintenanceRequest, Status, Team, EquipmentType, Equipment, \
+    Issue, IssueType
 from .serializers import PropertySerializer, FloorSerializer, RoomSerializer, RoomTypeSerializer, TaskSerializer, \
-    MaintenanceRequestSerializer, StatusSerializer, TeamSerializer, EquipmentTypeSerializer, EquipmentSerializer
+    MaintenanceRequestSerializer, StatusSerializer, TeamSerializer, EquipmentTypeSerializer, EquipmentSerializer, \
+    IssueTypeSerializer, IssueSerializer
 
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -61,3 +64,16 @@ class EquipmentTypeViewSet(BaseViewSet):
     queryset = EquipmentType.objects.all()
     serializer_class = EquipmentTypeSerializer
 
+class IssueTypeViewSet(BaseViewSet):
+    queryset = IssueType.objects.all()
+    serializer_class = IssueTypeSerializer
+
+
+class IssueViewSet(BaseViewSet):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
+
+def filter_issue_types(request):
+    equipment_id = request.GET.get('equipment_id')
+    issue_types = IssueType.objects.filter(equipment_id=equipment_id).values('id', 'type')
+    return JsonResponse({'issue_types': list(issue_types)})
