@@ -15,6 +15,9 @@ import os
 import environ
 from enum import Enum
 
+from django.db.models.functions import Degrees
+
+
 class enviroment(Enum):
     Local = 'LOCAL'
     UAT = 'UAT'
@@ -33,12 +36,12 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-peg2+#c*dodeelvjfj1h-x&=b-i+ix3*zjrmm&dk+-u@1@&7h-'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = True if CurrentEnv.value in('UAT','LOCAL') else False
+print(DEBUG)
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -142,11 +145,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+if DEBUG:
+    STATICFILES_DIRS = [
+        BASE_DIR / "static",
+    ]
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 # Default primary key field type
